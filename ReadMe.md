@@ -15,7 +15,6 @@ classDiagram
         +String phone
         +Passport passport
         +WorkInfo workInfo
-        +String authKey
     }
        class Passport {
         +String series
