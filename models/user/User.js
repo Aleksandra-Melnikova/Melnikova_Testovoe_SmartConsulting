@@ -35,11 +35,6 @@ User.prototype.generateToken = function () {
   this.token = keyGen();
 };
 
-User.prototype.toJSON = function () {
-  const { password, ...rest } = this;
-  return rest;
-};
-
 User.prototype.save = async function () {
   const usersCollection = getUsersCollection();
 

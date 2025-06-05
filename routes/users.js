@@ -7,13 +7,67 @@ const usersRouter = express.Router();
 usersRouter.post("/register", async (req, res) => {
   try {
     const userData = req.body;
-    const existingUser = await User.findOne({ username: userData.username });
 
-    if (existingUser) {
-      return res.status(400).json({ error: "Username already exists" });
+    const requiredFields = [
+      'username',
+      'password',
+      'lastName',
+      'firstName',
+      'birthDate',
+      'phone',
+      'passport.series',
+      'passport.number',
+      'passport.issuedBy',
+      'passport.issueDate'
+    ];
+
+    const missingFields = requiredFields.filter(field => {
+      if (field.includes('.')) {
+        const [parent, child] = field.split('.');
+        return !userData[parent] || !userData[parent][child];
+      }
+      return !userData[field];
+    });
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        missingFields,
+        message: `The following fields are required: ${missingFields.join(', ')}`
+      });
     }
-    if (!req.body.username || !req.body.password) {
-      return res.status(400).json({ error: "Username and password are required" });
+
+    const existingUser = await User.findOne({ username: userData.username });
+    if (existingUser) {
+      return res.status(400).json({
+        error: "Username already exists",
+        message: "User with this name already exists"
+      });
+    }
+
+    const phoneRegex = /^\+?\d{10,15}$/;
+    if (!phoneRegex.test(userData.phone)) {
+      return res.status(400).json({
+        error: "Invalid phone format",
+        message: "Invalid phone format"
+      });
+    }
+
+
+    const birthDate = new Date(userData.birthDate);
+    if (isNaN(birthDate.getTime())) {
+      return res.status(400).json({
+        error: "Invalid birth date",
+        message: "Birth date must be a valid date in format YYYY-MM-DD"
+      });
+    }
+
+    const passportIssueDate = new Date(userData.passport.issueDate);
+    if (isNaN(passportIssueDate.getTime())) {
+      return res.status(400).json({
+        error: "Invalid passport issue date",
+        message: "Passport issue date must be a valid date in format YYYY-MM-DD"
+      });
     }
 
     const user = new User(userData);
@@ -21,12 +75,25 @@ usersRouter.post("/register", async (req, res) => {
     user.generateToken();
     await user.save();
 
+    const userResponse = {
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      token: user.token
+    };
+
     res.status(201).json({
-      token: user.token,
-      message: "User registered successfully",
+      ...userResponse,
+      message: "User registered successfully"
     });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Registration error:', error);
+    res.status(500).json({
+      error: error.message,
+      message: "An error occurred while registering"
+    });
   }
 });
 
