@@ -1,6 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import { User } from "../models/user/User.js";
+import {getUsersCollection} from "../db.js";
 
 const usersRouter = express.Router();
 
@@ -123,9 +124,15 @@ usersRouter.post("/login", async (req, res) => {
 
 usersRouter.delete("/logout", auth, async (req, res) => {
   const user = req.user;
-  user.token = null;
-  await user.save();
+  const usersCollection = await getUsersCollection();
+
+  await usersCollection.updateOne(
+      { _id: user._id },
+      { $set: { token: null } }
+  );
+
   res.send({ message: "Success logout" });
 });
+
 
 export default usersRouter;
