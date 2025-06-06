@@ -1,4 +1,4 @@
-# Тестовое задание Мельникова 
+# Тестовое задание Мельникова Александра
 
 ## UML-диаграмма модели User
 
@@ -31,13 +31,15 @@ classDiagram
     User "1" --> "1" Passport
     User "1" --> "1" WorkInfo
 ```
+###  Клонирование репозитория
 
+    git clone git@github.com:Aleksandra-Melnikova/Melnikova_Testovoe_SmartConsulting.git
 ### Npm-скрипты
 #### Установка зависимостей
 - `npm install` — установка всех зависимостей проекта
 
 #### Разработка
-- `npm run dev` — запуск приложения в режиме разработки (Vite)
+- `npm run dev` — запуск приложения в режиме разработки 
 
 #### Анализ кода
 - `npm run format` — автоформатирование кода с помощью Prettier

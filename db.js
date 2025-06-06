@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb";
 import process from "node:process";
 
 const MONGODB_URI = "mongodb://localhost:27017";
-const DB_NAME = "testovoe";
+const DB_NAME = "testovoeMelnikova";
 
 let client;
 let db;
